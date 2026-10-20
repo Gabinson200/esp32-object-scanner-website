@@ -1,78 +1,109 @@
-# ESP32 Object Scanner Website
+<p align="center">
+  <a href="https://gabinson200.github.io/esp32-object-scanner-website/">
+    <img src="dist/assets/icon.svg" width="88" height="88" alt="ESP32 Object Scanner">
+  </a>
+</p>
 
-Public static website for creating a printable AprilTag board and installing matching ESP32 Object Scanner firmware directly over USB.
+<h1 align="center">ESP32 Object Scanner</h1>
 
-This is a standalone website repository. The scanner's C/C++ source, firmware patches, build environment, Git history, and private-repository links are excluded. Only the compiled firmware needed by the installer is distributed. Keep the original firmware repository private.
+<p align="center">
+  Create a printable AprilTag board and install matching scanner firmware directly from your browser.
+</p>
 
-The website's HTML, CSS, JavaScript, board generator, and compiled firmware are public. A separate repository keeps the original firmware source private; it does not prevent copying or reverse-engineering the binary.
+<p align="center">
+  <a href="https://gabinson200.github.io/esp32-object-scanner-website/"><strong>Open the website →</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://gabinson200.github.io/esp32-object-scanner-website/#board">Board generator</a>
+  &nbsp;·&nbsp;
+  <a href="https://gabinson200.github.io/esp32-object-scanner-website/#install">Install firmware</a>
+</p>
 
-## Publish with GitHub Pages
+---
 
-1. Create a new **public** GitHub repository named **`esp32-object-scanner-website`**. Use hyphens in the repository name. Leave the new repository empty; do not initialize it with a README, license, or .gitignore, since these files are already provided here.
-2. Extract this ZIP and open a terminal in the extracted `esp32-object-scanner-website` folder. Upload this folder's contents, including `.github/`, rather than the ZIP or an extra enclosing folder. Using Git:
+## What is it?
 
-   ```bash
-   git init -b main
-   git add .
-   git commit -m "Add static scanner website"
-   git remote add origin https://github.com/Gabinson200/esp32-object-scanner-website.git
-   git push -u origin main
-   ```
+ESP32 Object Scanner brings board creation and scanner setup into one webpage.
 
-   Run these commands only in this newly extracted folder. Do not copy the old firmware repository or its `.git` directory into the public repository.
+Design a custom AprilTag board, preview it in 3D, download the print files, and install firmware configured for your selected tag IDs and dimensions—without opening an IDE.
 
-3. Open the new repository's **Settings → Pages**. Under **Build and deployment → Source**, choose **GitHub Actions**.
-4. Open **Actions → Publish scanner website → Run workflow**, choose `main`, and run it. If the first push ran before Pages was enabled, rerun the failed workflow after completing step 3.
-5. Wait for the deployment to succeed. GitHub reports the live URL in the workflow and Pages settings. With this repository name and account, the expected address is:
+The scanner runs on a **Seeed XIAO ESP32-S3 Sense** with the **Seeed Round Display for XIAO**. Once configured, it captures views of a small object and reconstructs a colored 3D mesh on the device.
 
-   **https://gabinson200.github.io/esp32-object-scanner-website/**
+## What you can do
 
-Future pushes changing `dist/`, `scripts/`, `package.json`, or the workflow publish automatically. The workflow validates the board generator and firmware image before uploading **only `dist/`**. It does not fetch or access the private firmware repository, and no personal access token is needed.
+| Feature | Description |
+| --- | --- |
+| **Customize your board** | Choose four AprilTag 16h5 IDs and adjust board size, tag size, margins, and print thickness. |
+| **Preview before printing** | Inspect the board in an interactive 3D view or switch to a top view. |
+| **Download print files** | Export a 3MF, aligned white and black STLs, printable SVG, and board settings. |
+| **Install over USB** | Flash the scanner from a supported desktop browser using ESP Web Tools. |
+| **Keep settings matched** | Your selected tag IDs and dimensions are automatically included in the installation image. |
 
-GitHub Pages is available for public repositories on GitHub Free. Supported paid plans also allow Pages from private repositories; a separate public website repository is useful when you want the firmware repository to remain private without relying on that option.
+Board generation and firmware preparation happen in your browser. No file upload is required.
 
-## Local preview
+## From board to scan
 
-From this folder:
+### 1. Create your board
 
-```bash
-python -m http.server 8000 --directory dist
-```
+Open the [board generator](https://gabinson200.github.io/esp32-object-scanner-website/#board), select four different tag IDs, and adjust the dimensions.
 
-Open **http://localhost:8000/**. There are no packages to install and no website build step. For public hosting, use HTTPS. USB installation requires a desktop browser with Web Serial support, such as Chrome or Edge.
+The generator checks spacing and size limits as you edit. Use the 3D preview to inspect the result.
 
-## Files
+### 2. Print it
 
-- `dist/index.html`, `style.css`, and `app.js`: the webpage and controls.
-- `dist/board.js`, `viewer.js`, and `assets/`: AprilTag layouts, 3D preview, and printable downloads.
-- `dist/firmware-config.js`: writes the selected tag IDs and dimensions into the compiled firmware's configuration partition.
-- `dist/firmware/`: compiled firmware, installer manifest, checksum/compatibility metadata, dependency versions, and license notices.
-- `scripts/check-board.mjs` and `scripts/check-firmware.mjs`: website checks; no firmware source or compiler is included.
-- `.github/workflows/pages.yml`: GitHub Pages deployment.
+Download the print bundle and import the 3MF into your slicer as one multipart object. Assign **white** to the base and **black** to the marker parts.
 
-The page has no links to the private scanner repository and no website-source download link. Third-party license notices and ESP Web Tools attribution remain available.
+For STL files, import both parts together and preserve their alignment. Print at **100% scale** so the physical dimensions match the scanner settings.
 
-## Board and firmware behavior
+### 3. Install the firmware
 
-The generator supports flat color inlay boards with four AprilTag 16h5 markers. Default TL/TR/BL/BR IDs are **0/1/3/2**; defaults are an 80 mm board, 20 mm tags, and a 3.1 mm outer margin. The controls validate unique IDs, spacing, dimensions, and printable thicknesses.
+Connect your scanner with a USB data cable, open the [installer](https://gabinson200.github.io/esp32-object-scanner-website/#install), and choose its serial port.
 
-The browser generates a board configuration for the selected dimensions and IDs and combines it with the bundled firmware. It does not compile C++ or contact a private repository. Printing/exporting and firmware preparation happen in the browser.
+Use a desktop browser with Web Serial support, such as **Chrome or Edge**.
 
-The raw `scanner-merged.bin` is a template, not a ready-configured standalone download. Use the page's install button or configured firmware download. Installation clears saved scans and calibration; calibrate again afterward.
+> Installation clears saved scans and calibration. Run CALIBRATE afterward.
 
-## Firmware updates
+### 4. Calibrate and scan
 
-Build future firmware versions in the private scanner repository, preserving the board-configuration interface expected by this website. Then copy the release binary and its matching `manifest.json` and `build.json` into `dist/firmware/`. Update the checksum and version together and retain applicable dependency/license notices. Run the checks before pushing. Do not copy source files, patches, ELF files, maps, debug symbols, secrets, or the private repository's history.
+On the round display:
 
-With Node.js 22 or later, run the included checks using:
+1. Select **CALIBRATE** and capture the board from varied angles and distances.
+2. Place a small colored or dark object in the center of the board.
+3. Select **START SCAN** and follow the on-screen guidance.
+4. Select **GEN MESH** to generate and inspect the result.
 
-```bash
-npm run check
-```
+## Required hardware
 
-These checks cover board export geometry and validation, firmware checksum and partitions, and the selected-board image format. They do not replace a physical USB installation and scanner test.
+- **Seeed XIAO ESP32-S3 Sense** with camera
+- **Seeed Round Display for XIAO**
+- **USB data cable**
+- A printed AprilTag board
+- A compatible desktop browser for installation
 
-## External dependencies and licenses
+## Default board
 
-Three.js and marker grids are bundled. ESP Web Tools loads from its pinned unpkg URL; Google Fonts has system-font fallbacks. License notices are retained in `dist/THIRD_PARTY_NOTICES.txt` and the firmware notice files. This package does not grant a new open-source license for your original firmware or website code.
-"# esp32-object-scanner-website" 
+| Setting | Default |
+| --- | --- |
+| Board size | 80 × 80 mm |
+| Tag size | 20 mm |
+| Outer margin | 3.1 mm |
+| Tag family | AprilTag 16h5 |
+| IDs: top left / top right / bottom left / bottom right | 0 / 1 / 3 / 2 |
+| Print style | Flat color inlay |
+
+You can change these settings on the website before downloading and installing.
+
+## Scanning tips
+
+- Start with a colored or dark object approximately **47 mm across or smaller**.
+- Keep the board flat and the markers clearly visible.
+- Hold still when the scanner reaches a guided capture position.
+- White objects and hidden concavities are challenging for silhouette-based reconstruction.
+- A larger board does not increase the scanner’s reconstruction volume.
+
+## Credits
+
+Created by **Adam Kocsis**.
+
+Browser installation uses [ESP Web Tools](https://esphome.github.io/esp-web-tools/). The interactive preview uses Three.js.
+
+See the [third-party notices](dist/THIRD_PARTY_NOTICES.txt) for acknowledgments and licenses.
