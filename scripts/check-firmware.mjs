@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+import {PRESET} from '../dist/board.js';
+import {configuredFirmware,verifyTemplate,CONFIG_OFFSET,CONFIG_SIZE,crc32} from '../dist/firmware-config.js';
+const template=new Uint8Array(readFileSync(new URL('../dist/firmware/scanner-merged.bin',import.meta.url)));
+const info=JSON.parse(readFileSync(new URL('../dist/firmware/build.json',import.meta.url)));
+assert.equal(createHash('sha256').update(template).digest('hex'),info.sha256);
+verifyTemplate(template,info);
+const out=process.argv[2]||'/tmp/scanner-flash-checks',host=process.argv[3];mkdirSync(out,{recursive:true});
+const cases=[{...PRESET},{...PRESET,ids:[29,23,16,7],board:120,tag:24,margin:7},{...PRESET,board:240,tag:50,margin:7.5,ids:[5,12,19,28]}];
+const fingerprints=new Set();
+for(let i=0;i<cases.length;i++){
+ const p=cases[i],{image,fingerprint}=configuredFirmware(template,info,p),record=image.subarray(CONFIG_OFFSET,CONFIG_OFFSET+48),view=new DataView(record.buffer,record.byteOffset,record.byteLength);
+ assert.equal(image.length,CONFIG_OFFSET+CONFIG_SIZE);assert.deepEqual(image.subarray(0,template.length),template);
+ assert.ok(image.subarray(template.length,CONFIG_OFFSET).every(b=>b===255));assert.ok(image.subarray(CONFIG_OFFSET+48).every(b=>b===255));
+ assert.deepEqual([...record.subarray(24,28)],p.ids);assert.equal(view.getUint32(12,true),p.board*1000);assert.equal(view.getUint32(16,true),p.tag*1000);assert.equal(view.getUint32(20,true),p.margin*1000);assert.equal(view.getUint32(44,true),crc32(record.subarray(0,44)));
+ assert.equal(fingerprint,view.getUint32(44,true).toString(16).padStart(8,'0'));fingerprints.add(fingerprint);
+ writeFileSync(`${out}/configured-${i}.bin`,image);writeFileSync(`${out}/record-${i}.bin`,record);
+ if(host)process.stdout.write(execFileSync(host,[`${out}/record-${i}.bin`],{encoding:'utf8'}));
+}
+assert.equal(fingerprints.size,cases.length);
+assert.throws(()=>verifyTemplate(template,{...info,board_config:undefined}));
+assert.throws(()=>verifyTemplate(template,{...info,board_config:{...info.board_config,offset:0x180000}}));
+const damaged=template.slice();damaged[12]=0;assert.throws(()=>verifyTemplate(damaged,info));
+const oldLayout=template.slice();
+for(let at=0x8000;at<0x9000;at+=32)if(new TextDecoder().decode(oldLayout.subarray(at+12,at+28)).startsWith('board_cfg'))oldLayout[at+12]=0;
+assert.throws(()=>verifyTemplate(oldLayout,info));
+console.log('Passed: firmware checksum and partition validation, selected-board image contents, immutable application bytes, erased padding, and stale/invalid template rejection.');

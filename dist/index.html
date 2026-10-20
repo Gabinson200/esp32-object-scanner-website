@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Create a four-corner AprilTag board and install matching ESP32-S3 scanner firmware from your browser.">
+  <meta name="theme-color" content="#f4f5ef"><title>ESP32 Object Scanner</title>
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css?v=2">
+  <script type="importmap">{"imports":{"three":"./assets/three.module.js"}}</script>
+  <script type="module" src="./app.js?v=2"></script>
+</head>
+<body>
+<a href="#main" class="skip">Skip to content</a>
+<header class="header wrap">
+  <a class="brand" href="#" aria-label="ESP32 Object Scanner home"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 11V5h6m10 0h6v6M5 21v6h6m10 0h6v-6M10 12l6-3 6 3v8l-6 3-6-3zM10 12l6 4 6-4m-6 4v7" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>ESP32<span class="brand-light"> OBJECT SCANNER</span></span></a>
+  <nav aria-label="Main navigation"><a href="#board">Board setup</a><a href="#install">Install</a><a href="#start">Instructions</a></nav>
+</header>
+<main id="main">
+  <div class="intro wrap"><h1>ESP32 Object Scanner</h1><p>Create and print your AprilTag board, then install the matching firmware on your XIAO ESP32-S3 Sense.</p></div>
+  <section id="board" class="board-section"><div class="wrap">
+    <div class="section-heading"><div><div class="eyebrow">STEP 1</div><h2>Create your board</h2></div><p>The tag IDs and dimensions you choose here<br>are applied automatically during installation.</p></div>
+    <div class="generator" id="generator" aria-busy="true">
+      <div class="preview-column">
+        <div class="preview-toolbar"><span class="preview-title">BOARD PREVIEW</span><div class="segmented" role="group" aria-label="Preview mode"><button id="view-3d" class="active" aria-pressed="true">3D</button><button id="view-2d" aria-pressed="false">Top</button></div><button class="icon-button" id="reset-camera" aria-label="Reset camera view" title="Reset view">↺</button></div>
+        <div id="viewer" class="viewer"><div id="flat-preview" class="flat-preview"></div><div class="loading-note" id="preview-loading">Loading board…</div></div>
+        <div class="preview-caption"><span id="view-hint">Drag to orbit · scroll to zoom</span><span id="orientation-label">Finished board · files face down</span></div>
+        <div class="dimension-bar"><div><span>BOARD</span><strong id="board-dim">80 × 80 mm</strong></div><div><span>TAG EDGE</span><strong id="tag-dim">20 mm</strong></div><div><span>THICKNESS</span><strong id="height-dim">2 mm</strong></div></div>
+        <p class="print-tip">Import the 3MF as one multipart object and assign white and black filament. For STL, import both parts together and keep their alignment. Print at 100% scale.</p>
+      </div>
+      <div class="controls-column">
+        <div class="controls-heading"><h3>Board settings</h3><button class="reset-button" id="reset-preset">Restore defaults ↺</button></div>
+        <form id="board-form" novalidate>
+          <fieldset class="tag-ids"><legend>Corner tag IDs</legend><p class="field-help">AprilTag 16h5 · four different IDs from 0 to 29</p><div class="id-grid"><label>Top left<input name="id0" type="number" value="0" min="0" max="29" step="1" inputmode="numeric"></label><label>Top right<input name="id1" type="number" value="1" min="0" max="29" step="1" inputmode="numeric"></label><label>Bottom left<input name="id2" type="number" value="3" min="0" max="29" step="1" inputmode="numeric"></label><label>Bottom right<input name="id3" type="number" value="2" min="0" max="29" step="1" inputmode="numeric"></label></div></fieldset>
+          <div class="field-row"><label>Board size <span>mm</span><input name="board" type="number" value="80" min="80" max="240" step="0.1" inputmode="decimal"></label><label>Tag size <span>mm</span><input name="tag" type="number" value="20" min="12" max="20" step="0.1" inputmode="decimal"></label></div>
+          <label class="margin-field">White outer margin <span>mm</span><input name="margin" type="number" value="3.1" min="3" max="10" step="0.1" inputmode="decimal"></label>
+          <details class="dimension-help"><summary>Dimension limits</summary><ul><li>Board: 80–240 mm, at least four tag widths.</li><li>Tags: 12–50 mm.</li><li>Outer margin: at least 2 mm or 15% of the tag edge, whichever is greater.</li><li>Leave at least one tag-width of white space between the inner tag edges.</li></ul></details>
+          <details class="print-settings"><summary>Print thickness & orientation</summary><p class="field-help">Flat color inlay</p><div class="field-row"><label>Base thickness <span>mm</span><input name="base" type="number" value="2" min="1.2" max="6" step="0.1" inputmode="decimal"></label><label>Color depth <span>mm</span><input name="depth" type="number" value="0.6" min="0.2" max="1.2" step="0.1" inputmode="decimal"></label></div><label class="checkbox"><input type="checkbox" name="faceDown" checked><span>Prepare for face-down printing<small>Pattern starts on the build plate. Lift and flip the print to reveal the readable board.</small></span></label></details>
+        </form>
+        <div id="generator-message" class="compatibility" role="status">Checking board settings…</div>
+        <div class="download-actions"><button class="button primary full" id="download-bundle" disabled>Download print files <span aria-hidden="true">↓</span></button><div class="download-options"><button id="download-3mf" disabled>3MF only ↗</button><button id="download-svg" disabled>Printable SVG ↗</button></div><p class="small muted center">Bundle includes 3MF, aligned white/black STLs, SVG, and settings.</p></div>
+        <div class="download-status" id="download-status" aria-live="polite"></div>
+        <a class="next-step" href="#install">Next: install matching firmware ↓</a>
+      </div>
+    </div>
+  </div></section>
+  <section id="install" class="section wrap">
+    <div class="section-heading"><div><div class="eyebrow">STEP 2</div><h2>Install your scanner</h2></div><p>The install image includes your selected board settings.<br>Keep the USB cable connected until installation finishes.</p></div>
+    <div class="install-grid">
+      <div class="hardware-card"><h3>Required hardware</h3><ul class="hardware-list"><li><span>Controller</span><b>Seeed XIAO ESP32-S3 Sense</b></li><li><span>Display</span><b>Seeed Round Display for XIAO</b></li><li><span>Memory</span><b>8 MB flash · 8 MB PSRAM</b></li><li><span>Connection</span><b>USB data cable</b></li></ul></div>
+      <div class="install-card">
+        <h3>Connect by USB</h3><p class="install-intro">Close any serial monitor, then connect the XIAO using a data cable. Choose its serial port when prompted.</p>
+        <div id="install-board" class="install-board" aria-live="polite">Choose your board settings above.</div>
+        <div class="installer-zone"><div id="install-status" class="status" role="status">Loading installer…</div><div id="installer-mount"></div><button id="retry-install" class="button secondary" hidden>Retry loading installer</button><noscript>Enable JavaScript to use the installer and board generator.</noscript></div>
+        <button id="download-firmware" class="firmware-file" disabled>Download configured firmware (.bin) ↓</button>
+        <p class="small erase-note">Installation clears saved scans and calibration. Run CALIBRATE afterward.</p>
+        <details class="help-details"><summary>Connection help</summary><p>Browser flashing requires HTTPS or localhost and a desktop browser with Web Serial support, such as Chrome or Edge. If the board is missing, try another data cable or USB port. To enter download mode, hold BOOT, press and release RESET, then release BOOT. Reconnect and choose the new port.</p></details>
+      </div>
+    </div>
+  </section>
+  <section id="start" class="section instructions wrap">
+    <div class="section-heading"><div><div class="eyebrow">STEP 3</div><h2>Calibrate and scan</h2></div></div>
+    <ol class="instruction-list"><li><h3>Calibrate the camera</h3><p>On the round display, tap CALIBRATE. Capture varied board angles and distances with at least three tags visible. The device saves a successful calibration.</p></li><li><h3>Capture the object</h3><p>Place a small colored or dark object in the center. Tap START SCAN and follow the on-screen guidance. Hold still at each target to capture automatically.</p></li><li><h3>Generate the mesh</h3><p>Choose GEN MESH, then drag the model to inspect it. Add more views if needed and save the result on the scanner.</p></li></ol>
+    <p class="scan-note">The scanning volume remains approximately 47 mm across, even with a larger board. White objects and hidden concavities are difficult for silhouette-based scanning.</p>
+  </section>
+</main>
+<footer class="wrap"><span class="brand">ESP32 Object Scanner</span><div><a href="./THIRD_PARTY_NOTICES.txt">Licenses</a><a href="https://esphome.github.io/esp-web-tools/" target="_blank" rel="noopener">ESP Web Tools ↗</a></div></footer>
+</body></html>

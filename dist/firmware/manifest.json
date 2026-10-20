@@ -1,0 +1,17 @@
+{
+  "name": "ESP32 Object Scanner",
+  "version": "1.1",
+  "new_install_prompt_erase": false,
+  "new_install_improv_wait_time": 0,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "parts": [
+        {
+          "path": "scanner-merged.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}

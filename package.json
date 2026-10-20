@@ -1,0 +1,11 @@
+{
+  "name": "esp32-object-scanner-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Static board generator and browser firmware installer for the ESP32 Object Scanner",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "check": "node scripts/check-board.mjs && node scripts/check-firmware.mjs"
+  }
+}
