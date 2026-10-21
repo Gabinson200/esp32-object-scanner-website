@@ -76,7 +76,7 @@ function refreshInstall(){
       if(prepared&&!prepared.activated)for(const url of [prepared.imageURL,prepared.manifestURL]){URL.revokeObjectURL(url);installURLs.delete(url);}
       const next=configuredFirmware(template,buildInfo,current);
       const imageURL=installURL(new Blob([next.image],{type:'application/octet-stream'}));
-      const manifest={name:'ESP32 Object Scanner',version:'1.1',new_install_prompt_erase:false,new_install_improv_wait_time:0,builds:[{chipFamily:'ESP32-S3',parts:[{path:imageURL,offset:0}]}]};
+      const manifest={name:'ESP32 Object Scanner',version:String(buildInfo.version),new_install_prompt_erase:false,new_install_improv_wait_time:0,builds:[{chipFamily:'ESP32-S3',parts:[{path:imageURL,offset:0}]}]};
       const manifestURL=installURL(new Blob([JSON.stringify(manifest)],{type:'application/json'}));
       prepared={...next,imageURL,manifestURL,parameters:structuredClone(current)};
     }

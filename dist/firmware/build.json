@@ -1,11 +1,11 @@
 {
-  "version": "1.1",
+  "version": "1.2",
   "toolchain": "PlatformIO espressif32 6.12.0 / ESP-IDF 5.5.0",
   "flash_size": "8MB",
   "flash_mode": "dio",
   "flash_freq": "80m",
-  "bytes": 776816,
-  "sha256": "7f6e3573d47ad7cb5669fadaf3bd546f67262a8eaae500f1b4e0e793c1d47e93",
+  "bytes": 780096,
+  "sha256": "cf0d2c777ef2676d0026cf91415c4c475621912a414a46221c1cb231bdba84f5",
   "hardware_tested": false,
   "board_config": {
     "version": 1,
