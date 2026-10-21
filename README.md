@@ -85,7 +85,7 @@ On the round display:
 | --- | --- |
 | Board size | 80 × 80 mm |
 | Tag size | 20 mm |
-| Outer margin | 3.1 mm |
+| Outer margin | 3.0 mm |
 | Tag family | AprilTag 16h5 |
 | IDs: top left / top right / bottom left / bottom right | 0 / 1 / 3 / 2 |
 | Print style | Flat color inlay |

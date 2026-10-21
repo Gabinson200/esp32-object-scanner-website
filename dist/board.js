@@ -1,6 +1,6 @@
 // Four-corner AprilTag 16h5 print-board generator.
 // Physical units are millimeters. All geometry and file generation is local.
-export const PRESET = Object.freeze({mode:'quad',dictionary:'DICT_APRILTAG_16h5',ids:[0,1,3,2],board:80,tag:20,margin:3.1,base:2,depth:0.6,style:'flat',faceDown:true});
+export const PRESET = Object.freeze({mode:'quad',dictionary:'DICT_APRILTAG_16h5',ids:[0,1,3,2],board:80,tag:20,margin:3.0,base:2,depth:0.6,style:'flat',faceDown:true});
 export function validate(p, dictionaries) {
   if (p.mode!=='quad' || p.dictionary!=='DICT_APRILTAG_16h5' || p.style!=='flat') throw Error('Only four-corner AprilTag 16h5 boards with flat color inlay are supported.');
   for (const key of ['board','tag','margin','base','depth']) {
